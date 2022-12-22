@@ -1,7 +1,7 @@
 import { UpdateBlogDto } from './../blog/dto/update-blog.dto';
 import { Injectable } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
-import { LoggerService } from '../logger/custom.logger';
+import { LoggerService } from '../../logger/custom.logger';
 import { BlogCommentRepository } from './blog-comment.repository';
 import { BlogCommentEntity } from './entities/blog-comment.entity';
 import { Repository, Entity, DeleteResult } from 'typeorm';
@@ -57,5 +57,9 @@ export class BlogCommentService extends BaseService<BlogCommentEntity, BlogComme
     return this.repository.find({
       where: { blogId: id },
     });
+  }
+
+  async findAllCommentByUser(userId, blogId) {
+    return;
   }
 }

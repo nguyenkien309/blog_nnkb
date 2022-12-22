@@ -31,6 +31,11 @@ export class BlogCommentController {
     return this.blogCommentService.findAllCommentId(id);
   }
 
+  @Get(':id/user')
+  async testABC(@AuthUser() authUser: AuthUserDto, @Param('id') id: EntityId) {
+    return this.blogCommentService.findAllCommentByUser(authUser, id);
+  }
+
   @Get(':id')
   async findBlogComment(@Param('id') id: EntityId) {
     return this.blogCommentService.findCommentId(id);
