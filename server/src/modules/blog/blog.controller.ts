@@ -1,3 +1,4 @@
+import { PaginationQueryDto } from './dto/paginate-blog.dto';
 import { BlogLikeService } from './../blog-like/blog-like.service';
 import { BlogLikeEntity } from './../blog-like/entities/blog-like.entity';
 import { CreateBlogLikeDto } from './../blog-like/dto/create-blog-like.dto';
@@ -24,15 +25,18 @@ import {
   Patch,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { DeleteResult } from 'typeorm';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('v1/blog')
 @Controller('v1/blog')
-@UseGuards(JwtAuthGuard)
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   @HttpCode(HttpStatus.OK)
   @Post('')
@@ -45,9 +49,19 @@ export class BlogController {
     return new BaseResponseDto<BlogEntity>(blog);
   }
 
+  @Get(':id/user-blog')
+  async listBlogUser(@Param('id') id: EntityId, @AuthUser() authUser: AuthUserDto) {
+    return this.blogService.getBlogUser(id, authUser);
+  }
+
   @Get('/blog-paginate')
   async listBlogsPaginate() {
-    return this.blogService.getBlogsPaginate();
+    return;
+  }
+
+  @Get('/blog-paginate/test')
+  async listBlogsPaginateTest(@AuthUser() authUser: AuthUserDto, @Query() query: PaginationQueryDto) {
+    return this.blogService.getBlogsPaginate(authUser, query);
   }
 
   // @Get('/blogTag')
@@ -86,6 +100,18 @@ export class BlogController {
   //   return new BaseResponseDto<BlogEntity>(plainToClass(BlogEntity, blog));
   // }
 
+  // @UseInterceptors(FileInterceptor('file'))
+  // @Patch(':id')
+  // async editBlog(
+  //   @Param('id') blogId: EntityId,
+  //   @Body() updateBlogDto: UpdateBlogDto,
+  //   @UploadedFile() file: Express.Multer.File,
+  // ): Promise<BaseResponseDto<BlogEntity>> {
+  //   const blog = await this.blogService.editBlog(blogId, updateBlogDto, file);
+  //   return new BaseResponseDto<BlogEntity>(plainToClass(BlogEntity, blog));
+  // }
+
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   @Patch(':id')
   async editBlog(
@@ -93,12 +119,13 @@ export class BlogController {
     @Body() updateBlogDto: UpdateBlogDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<BaseResponseDto<BlogEntity>> {
-    const blog = await this.blogService.editBlog(blogId, updateBlogDto, file);
+    const blog = await this.blogService.editBlog2(blogId, updateBlogDto, file);
     return new BaseResponseDto<BlogEntity>(plainToClass(BlogEntity, blog));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async destroy(@Param('id') id: EntityId): Promise<BaseResponseDto<DeleteResult>> {
+  async destroy(@Param('id') id: EntityId, @AuthUser() authUser: AuthUserDto): Promise<BaseResponseDto<DeleteResult>> {
     await this.blogService.delete(id);
     return new BaseResponseDto<DeleteResult>(null);
   }

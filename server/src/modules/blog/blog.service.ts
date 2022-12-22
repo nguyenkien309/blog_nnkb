@@ -6,12 +6,13 @@ import { UpdateBlogDto } from './dto/update-blog.dto';
 import { EntityId } from 'typeorm/repository/EntityId';
 import { UploadService } from './../upload-file/upload-file.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
-import { LoggerService } from './../logger/custom.logger';
+import { LoggerService } from '../../logger/custom.logger';
 import { Repository, Entity, DeleteResult } from 'typeorm';
 import { BlogRepository } from './blog.repository';
 import { BaseService } from './../../base/base.service';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { BlogEntity } from './entities/blog.entity';
+import { PaginationQueryDto } from '@base/base.dto';
 
 @Injectable()
 export class BlogService extends BaseService<BlogEntity, BlogRepository> {
@@ -23,8 +24,18 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     super(repository, logger);
   }
 
-  async getBlogsPaginate() {
-    return;
+  async getBlogsPaginate(userId, query: PaginationQueryDto) {
+    const { limit = 1, page = 2, sort } = query;
+    // console.log(query)
+
+    const qb = this.repository.createQueryBuilder('blogs');
+    qb.andWhere('blogs.deleted = false');
+    qb.skip(limit * page)
+      .take(limit)
+      .orderBy(sort?.by, sort?.direction);
+
+    const [blogs, total] = await qb.getManyAndCount();
+    return blogs;
   }
 
   async listTest() {
@@ -69,6 +80,13 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     // });
   }
 
+  async getBlogUser(id, user) {
+    // console.log(user);
+    // return user;
+    return this.repository.find({
+      where: { userId: id },
+    });
+  }
   // async getBlogByIdRlt(id) {
   //   return this.repository.findOne({
   //     relations: ['comments', 'blog-like'],
@@ -87,7 +105,7 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
       const arrayTag = tagsArray.map((tag) => JSON.parse(tag));
       createBlog.tags = arrayTag as TagEntity[];
     }
-    console.log('createBlog.tags', createBlog.tags);
+    // console.log('createBlog.tags', createBlog.tags);
 
     await this.repository.save(createBlog);
     // const blog = await this._store(createBlog);
@@ -103,18 +121,51 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     // return;
   }
 
-  async editBlog(blogId: EntityId, updateBlogDto: UpdateBlogDto, file): Promise<BlogEntity | undefined> {
-    // const blog = await this._findById(blogId);
-    // const updateBlog = new BlogEntity(updateBlogDto);
-    // if (!blog) {
-    //   throw new HttpException(`Not Found Blog : ${blogId}`, HttpStatus.BAD_REQUEST);
-    // }
-    // if (file) {
-    //   const filepath = await this.uploadService.createFile(file);
-    //   updateBlog.blogImage = filepath;
-    // }
-    // return this._update(blogId, updateBlog);
-    return;
+  // async editBlog(blogId: EntityId, updateBlogDto: UpdateBlogDto, file): Promise<BlogEntity | undefined> {
+  //   const blog = await this._findById(blogId);
+  //   const updateBlog = new BlogEntity(updateBlogDto);
+  //   if (!blog) {
+  //     throw new HttpException(`Not Found Blog : ${blogId}`, HttpStatus.BAD_REQUEST);
+  //   }
+  //   if (file) {
+  //     const filepath = await this.uploadService.createFile(file);
+  //     updateBlog.blogImage = filepath;
+  //     if (updateBlog.tags) {
+  //       const tagsArray = updateBlogDto.tags.map((tag) => JSON.parse(JSON.stringify(tag)));
+  //       const arrayTag = tagsArray.map((tag) => JSON.parse(tag));
+  //       updateBlog.tags = arrayTag as TagEntity[];
+  //     }
+  //   }
+
+  //   return this._update(blogId, updateBlog);
+  // }
+
+  async editBlog2(id, updateBlogDto: UpdateBlogDto, file) {
+    updateBlogDto.blogId = id;
+    let { blogImage } = updateBlogDto;
+    const post = await this._findById(id);
+    let arrayTag;
+    const updateBlog = new BlogEntity(updateBlogDto);
+    if (file) {
+      const filepath = await this.uploadService.createFile(file);
+      blogImage = filepath;
+      if (updateBlogDto.tags) {
+        const tagsArray = updateBlogDto.tags.map((tag) => JSON.parse(JSON.stringify(tag)));
+        arrayTag = tagsArray.map((tag) => JSON.parse(tag));
+        // console.log('updateBlogDto.tags', updateBlogDto.tags);
+        console.log('tagsArray', tagsArray);
+      }
+    }
+
+    // post.title = title;
+    // post.content = content;
+    post.blogImage = blogImage;
+    console.log('blogImage', blogImage);
+
+    post.tags = arrayTag ? arrayTag : updateBlogDto.tags;
+    // console.log('post.tags', arrayTag);
+    await this.repository.save(post);
+    return post;
   }
 
   async deleteBlog(blogId: EntityId): Promise<DeleteResult | undefined> {

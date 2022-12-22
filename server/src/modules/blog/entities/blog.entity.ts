@@ -25,7 +25,7 @@ export class BlogEntity extends DateAudit {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   content: string;
 
   @Column({ default: 0, nullable: true })
@@ -51,7 +51,7 @@ export class BlogEntity extends DateAudit {
   userCreated: UserEntity[];
 
   @ManyToOne(() => UserEntity, (user) => user.blogs, { eager: true, onDelete: 'CASCADE' })
-  user: number;
+  user: UserEntity;
 
   @OneToMany(() => BlogCommentEntity, (comment) => comment.blog, { eager: true })
   comments: BlogCommentEntity[];
