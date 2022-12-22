@@ -14,8 +14,8 @@ const EditProfileForm: FC<EditProfileFormProps> = ({ file, setFile }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const [userInfo, setUserInfo] = useState({
-    firstName: '',
-    lastName: '',
+    // firstName: '',
+    // lastName: '',
     name: '',
     email: '',
     role: '',
@@ -33,8 +33,8 @@ const EditProfileForm: FC<EditProfileFormProps> = ({ file, setFile }) => {
     e.preventDefault();
     setMessage('');
     if (
-      user.firstName === userInfo.firstName &&
-      user.lastName === userInfo.lastName &&
+      // user.firstName === userInfo.firstName &&
+      // user.lastName === userInfo.lastName &&
       user.name === userInfo.name &&
       user.email === userInfo.email &&
       user.role === userInfo.role &&
@@ -42,16 +42,9 @@ const EditProfileForm: FC<EditProfileFormProps> = ({ file, setFile }) => {
     ) {
       setMessage('Please edit fields!');
     } else {
-      UserService.updateUser(
-        user.id,
-        userInfo.firstName,
-        userInfo.lastName,
-        userInfo.name,
-        userInfo.email,
-        file
-      )
+      UserService.updateUser(file)
         .then((response) => {
-          dispatch(setUser(response.data));
+          dispatch(setUser(response.data.body));
           setMessage('Changes saved!');
         })
         .catch((error) => setMessage(error.message));
