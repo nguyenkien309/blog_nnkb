@@ -19,22 +19,26 @@ export const authorizeUser = createAsyncThunk(
   async (args: authArgs, thunkAPI) => {
     try {
       let response;
+      const refresh_token = localStorage.getItem('refreshToken');
       if (args.type === 'login') {
         response = await AuthService.login(args.email!, args.password!);
       } else if (args.type === 'register') {
         response = await AuthService.registration(
           args.name!,
-          args.firstName!,
-          args.lastName!,
           args.email!,
           args.password!,
           args.passwordConfirmation!
         );
       } else if (args.type === 'checkAuth') {
-        response = await axios.get<AuthResponse>(`${API_URL}/auth/refresh`, {
-          withCredentials: true,
-        });
+        response = await axios.post<AuthResponse>(
+          `${API_URL}/v1/auth/refresh`,
+          {
+            refresh_token,
+          }
+        );
       }
+      console.log('response REFRESH TOKEN', response);
+
       return response?.data;
     } catch (e) {
       return thunkAPI.rejectWithValue(e);

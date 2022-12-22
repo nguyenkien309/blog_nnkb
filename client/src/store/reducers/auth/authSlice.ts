@@ -10,8 +10,10 @@ interface AuthState {
   error: string;
 }
 const initialState: AuthState = {
-  user: {} as IUser,
-  isAuth: false,
+  // user: {} as IUser,
+  user: JSON.parse(localStorage.getItem('userInfo') ?? ''),
+  // isAuth: false,
+  isAuth: JSON.parse(localStorage.getItem('isAuth') || 'false'),
   isLoading: false,
   error: '',
 };
@@ -36,15 +38,22 @@ export const authSlice = createSlice({
       state: AuthState,
       action: PayloadAction<AuthResponse>
     ) => {
-      //   console.log('cc', action.payload.body.token.accessToken);
-
+      // console.log('cc', action.payload.body);
+      console.log('authorizeUser', authorizeUser.pending.type);
       localStorage.setItem('token', action.payload.body.token.accessToken);
+      localStorage.setItem(
+        'refreshToken',
+        action.payload.body.token.refreshToken
+      );
+      // console.log('data', action.payload.body.token);
+
       //   localStorage.setItem('role', action.payload.user.role);
       state.isLoading = false;
       state.isAuth = true;
+      localStorage.setItem('isAuth', JSON.stringify(state.isAuth));
       state.user = action.payload.body;
-      // console.log('state.user', action.payload.body);
-
+      // console.log('state.user', action.payload.body);\
+      localStorage.setItem('userInfo', JSON.stringify(state.user));
       state.error = '';
     },
     [authorizeUser.rejected.type]: (
@@ -63,7 +72,9 @@ export const authSlice = createSlice({
     },
     [logoutUser.fulfilled.type]: (state: AuthState, action) => {
       localStorage.removeItem('token');
-      //   localStorage.removeItem('role');
+      localStorage.removeItem('isAuth');
+      localStorage.removeItem('role');
+      localStorage.removeItem('refreshToken');
       state.user = {} as IUser;
       state.isAuth = false;
     },
