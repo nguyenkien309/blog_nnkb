@@ -17,7 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         synchronize: true,
         autoLoadEntities: true,
         logging: 'all',
-        logger: 'advanced-console',
+        logger: 'file',
         // ssl: {
         //   require: false,
         //   rejectUnauthorized: false,

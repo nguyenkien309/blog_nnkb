@@ -1,5 +1,5 @@
 import { PAGE_SIZE } from './../config/config';
-import { LoggerService } from './../modules/logger/custom.logger';
+import { LoggerService } from '../logger/custom.logger';
 import { IBaseService } from './i.base.service';
 import { BaseEntity, FindOptionsOrder, FindOptionsWhere, In, Repository, DataSource, DeleteResult } from 'typeorm';
 // tim
