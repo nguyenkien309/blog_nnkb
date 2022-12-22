@@ -32,7 +32,7 @@ export class BlogLikeController {
     @AuthUser() authUser: AuthUserDto,
     @Body() createBlogLikeDto: CreateBlogLikeDto,
   ) {
-    const user = await this.userService._findById(authUser.payload.id);
+    const user = await this.userService._findById(authUser.id);
     // const createBlogLikeDto = new CreateBlogLikeDto();
     // createBlogLikeDto.blogId = <number>blogId;
     // createBlogLikeDto.userId = user.id;

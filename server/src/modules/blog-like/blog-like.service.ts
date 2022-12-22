@@ -4,7 +4,7 @@ import { DeleteResult } from 'typeorm';
 import { BlogService } from './../blog/blog.service';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
-import { LoggerService } from '../logger/custom.logger';
+import { LoggerService } from '../../logger/custom.logger';
 import { BlogLikeRepository } from './blog-like.repository';
 import { BlogLikeEntity } from './entities/blog-like.entity';
 import { CreateBlogLikeDto } from './dto/create-blog-like.dto';
