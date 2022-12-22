@@ -7,8 +7,8 @@ export class TagEntity extends DateAudit {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'blogId', nullable: true })
-  blogId: number;
+  // @Column({ name: 'blogId', nullable: true })
+  // blogId: number;
 
   @Column()
   name: string;
