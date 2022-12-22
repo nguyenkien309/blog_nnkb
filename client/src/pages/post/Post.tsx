@@ -32,18 +32,25 @@ const Post = () => {
   useTitle(post.title);
 
   useEffect(() => {
-    // console.log('user', user.id);
+    console.log('user', user.id);
 
     const getPost = async () => {
       try {
+        const userLiked = localStorage.getItem('userInfo');
+        console.log('userLiked', userLiked);
         const fetchedPost = await PostService.getById(Number(postId));
-        const getUserLike = await PostService.getUserLikeBlog(user.id, post.id);
+        const getUserLike = await PostService.getUserLikeBlog(
+          user?.id,
+          Number(postId)
+        );
+
         console.log('getUserLikeBlog', getUserLike.data);
         if (getUserLike.data == true) {
           setLikedPost(true);
         } else {
           setLikedPost(false);
         }
+
         // const response = await PostService.likePost(user.id, post.id);
         // console.log('POST NUMLKIKE', fetchedPost.data.numLike);
 
@@ -145,7 +152,7 @@ const Post = () => {
             <div className={'postInfoWrapper'}>
               <div className={'author'}>
                 <LazyLoad>
-                  <img src={post?.user.avatar} alt="postPicture" />
+                  <img src={post?.user?.avatar} alt="postPicture" />
                 </LazyLoad>
 
                 <div className={'authorDetails'}>
@@ -158,7 +165,7 @@ const Post = () => {
                   </span>
                 </div>
               </div>
-              {user?.id === post.user.id && (
+              {user?.id === post?.user?.id && (
                 <EditPostButtons postPage={true} post={post} />
               )}
             </div>
