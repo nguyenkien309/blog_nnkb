@@ -41,8 +41,11 @@ export const postsSlice = createSlice({
     ) => {
       state.isLoading = false;
       if (action.payload.type === 'blogs-lastest') {
-        state.todayPosts = action.payload.data.slice(0, 5);
+        // state.todayPosts = action.payload.data.slice(0, 5);
+        state.todayPosts = action.payload.data;
       }
+      console.log('action.payload.data', action.payload.data);
+
       state.posts = action.payload.data;
       state.postsType = action.payload.type;
     },
