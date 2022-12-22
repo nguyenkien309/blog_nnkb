@@ -14,9 +14,6 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'last name is not empty' })
   lastName: string;
 
-  @IsOptional()
-  avatarId: number;
-
   @IsNotEmpty({ message: 'password is not empty' })
   @Length(8, 24, { message: 'password invalid' })
   password: string;

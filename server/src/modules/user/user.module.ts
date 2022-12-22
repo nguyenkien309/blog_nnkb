@@ -6,7 +6,6 @@ import { UserEntity } from './entities/user.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserSubscriber } from './subscriber/user.subscriber';
-import { UploadFileController } from '../upload-file/upload-file.controller';
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity])],
   controllers: [UserController],

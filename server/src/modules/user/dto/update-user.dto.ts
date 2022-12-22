@@ -20,15 +20,12 @@ export class UpdateUserDto {
   // avatar: string;
   /////
 
-  @IsNotEmpty()
-  id: string;
+  // @IsNotEmpty()
+  // id: string;
 
-  @IsNotEmpty()
-  name: string;
-
-  @IsNotEmpty()
+  @ApiProperty()
   @IsOptional()
-  email: string;
+  name: string;
 
   @ApiProperty()
   @IsOptional()

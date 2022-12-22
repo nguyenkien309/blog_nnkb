@@ -9,13 +9,12 @@ import { Role } from 'src/constant/role.enum';
 @Entity({ name: 'users' })
 export class UserEntity extends DateAudit {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
-  @Column({ name: 'name' })
+  @Column({ name: 'name', nullable: true })
   name: string;
 
-  @Unique(['email'])
-  @Column()
+  @Column({ name: 'email', type: 'varchar', nullable: true })
   email: string;
 
   @Exclude()
@@ -29,8 +28,8 @@ export class UserEntity extends DateAudit {
   })
   avatar: string;
 
-  @Column({ name: 'role', type: 'enum', default: Role.USER, enum: Role })
-  role: Role;
+  @Column({ name: 'role', type: 'varchar', default: Role.USER })
+  role: string;
 
   // @OneToMany(() => BlogEntity, (blog) => blog.user)
   // blog: BlogEntity[];
@@ -50,7 +49,7 @@ export class UserEntity extends DateAudit {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ default: '', name: 'refreshToken' })
+  @Column({ default: '', name: 'refreshToken', nullable: true })
   refreshToken: string;
 
   constructor(partial: Partial<UserEntity>) {
