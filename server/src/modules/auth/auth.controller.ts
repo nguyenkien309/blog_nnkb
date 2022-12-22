@@ -18,6 +18,8 @@ import {
   UseInterceptors,
   UploadedFile,
   Param,
+  UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -48,7 +50,6 @@ export class AuthController {
   @Post('/register')
   async register(@Body() registerRequestDto: RegisterRequestDto): Promise<BaseResponseDto<UserEntity>> {
     const user = await this.userService._store(registerRequestDto);
-
     return new BaseResponseDto<UserEntity>(plainToClass(UserEntity, user));
   }
 
@@ -62,7 +63,10 @@ export class AuthController {
 
   @Post('refresh')
   async refresh(@Body() body) {
-    return await this.authService.refresh(body.refresh_token);
+    if (body.refresh_token) {
+      return await this.authService.refresh(body.refresh_token);
+    }
+    throw new BadRequestException('refresh token is required');
   }
 
   // @UseInterceptors(FileInterceptor('file'))
@@ -82,11 +86,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('/update-profile')
   async updateUser(
-    // @AuthUser() authUser: AuthUserDto,
+    @AuthUser() authUser: AuthUserDto,
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<BaseResponseDto<UserEntity>> {
-    const updateUser = await this.userService.updateUser(updateUserDto, file);
+    const updateUser = await this.userService.updateUser(authUser, updateUserDto, file);
     return new BaseResponseDto<UserEntity>(plainToClass(UserEntity, updateUser));
   }
 

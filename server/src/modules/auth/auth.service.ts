@@ -54,6 +54,7 @@ export class AuthService {
     const payload: AuthUserDto = {
       email: user.email,
       id: user.id,
+      role: user.role,
     };
     const token = await this.createToken(payload, true);
     // const acessToken = await this.createToken(payload);
