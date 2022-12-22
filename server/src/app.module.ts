@@ -1,8 +1,9 @@
+import { I18nModule } from './i18n/i18n.module';
 import { TagModule } from './modules/tag/tag.module';
 import { BlogLikeModule } from './modules/blog-like/blog-like.module';
 import { BlogsModule } from './modules/blog/blog.module';
 import { AllExceptionFilter } from './filter/exception.filter';
-import { LoggerModule } from './modules/logger/logger.module';
+import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { DatabaseModule } from './database/database.module';
@@ -18,6 +19,7 @@ import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { BlogCommentModule } from './modules/blog-comment/blog-comment.module';
+import { ValidatorsModule } from './validator/validator.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { BlogCommentModule } from './modules/blog-comment/blog-comment.module';
     BlogLikeModule,
     BlogCommentModule,
     TagModule,
+    I18nModule,
+    ValidatorsModule,
   ],
   controllers: [AppController],
   providers: [

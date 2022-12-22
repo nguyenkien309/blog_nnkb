@@ -17,6 +17,9 @@ export const THROTTLE_LIMIT = parseInt(process.env.THROTTLE_LIMIT) || 300;
 // BCRYPT_SALT
 export const BCRYPT_SALT = parseInt(process.env.BCRYPT_SALT, 10) || 10;
 
+// i18n
+export const DEFAULT_LOCALE = process.env.DEFAULT_LOCALE || 'vi';
+
 // JSON Web Token
 export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
@@ -27,12 +30,12 @@ export const JWT_REFESH_EXPIRES_IN = process.env.JWT_REFESH_EXPIRES_IN;
 export const JWT_REFRESH_TOKEN_EXPIRATION = process.env.JWT_REFRESH_TOKEN_EXPIRATION;
 
 // DATABASE
-export const DATABASE_CONNECTION = process.env.DATABASE_CONNECTION || 'postgres';
+export const DATABASE_CONNECTION = process.env.DATABASE_CONNECTION || 'mysql';
 export const DATABASE_HOST = process.env.DATABASE_HOST || 'localhost';
-export const DATABASE_PORT = parseInt(process.env.DATABASE_PORT, 10) || 5432;
-export const DATABASE_USERNAME = process.env.DATABASE_USERNAME || 'postgres';
-export const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD || 'kiendzpro21';
-export const DATABASE_DB_NAME = process.env.DATABASE_DB_NAME || 'instagram';
+export const DATABASE_PORT = parseInt(process.env.DATABASE_PORT, 10) || 3306;
+export const DATABASE_USERNAME = process.env.DATABASE_USERNAME || 'root';
+export const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD || 'password';
+export const DATABASE_DB_NAME = process.env.DATABASE_DB_NAME || 'nest-starter';
 
 // FILE
 export const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE, 10);
