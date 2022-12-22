@@ -5,8 +5,8 @@ import { ITag } from './tag-type';
 
 export interface IPost {
   id: number;
+  blogId: any;
   title: string;
-  text: string;
   dateAndTimePublish: Date;
   blogImage: string;
   content: string;

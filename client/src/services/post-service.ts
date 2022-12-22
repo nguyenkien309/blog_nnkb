@@ -45,34 +45,32 @@ export default class PostService {
 
   static async updatePost(
     title: string,
-    text: string,
-    blogImage: string,
+    content: string,
     postId: number,
-    picture?: any,
-    tags?: ITag[]
+    picture: any,
+    // tags?: ITag[]
+    tags?: any
     //
-  ): Promise<AxiosResponse<IPost>> {
+  ) {
     if (picture) {
       const formData = new FormData();
-      formData.append('title', title);
-      formData.append('text', text);
-      formData.append('content', text);
-      formData.append('blogImage', blogImage);
-      formData.append('picture', picture);
-      formData.append('postId', postId.toString());
+      // formData.append('title', title);
+      // formData.append('content', content);
+      // formData.append('blogId', postId.toString());
+      formData.append('file', picture);
       if (tags && tags.length > 0) {
-        tags.forEach((tag) => {
-          formData.append('tags[]', JSON.stringify(tag));
+        tags.forEach((tag: any) => {
+          formData.append('tags', JSON.stringify(tag));
         });
+        console.log('tag append', tags);
       }
-      return api.put<IPost>(`/v1/blog/${postId}`, formData);
+      return api.patch<IPost>(`/v1/blog/${postId}`, formData);
     }
-    return api.put<IPost>(`/v1/blog/${postId}`, {
-      title,
-      text,
-      blogImage,
-      postId,
-      tags,
+    return api.patch<IPost>(`/v1/blog/${postId}`, {
+      // title,
+      // content,
+      // postId,
+      // picture,
     });
   }
 
@@ -160,6 +158,7 @@ export default class PostService {
   }
 
   static async getByUserId(userId: number): Promise<AxiosResponse<IPost[]>> {
-    return api.get<IPost[]>(`/posts/user/${userId}`);
+    // return api.get<IPost[]>(`/posts/user/${userId}`);
+    return api.get<IPost[]>(`/v1/blog/${userId}/user-blog`);
   }
 }

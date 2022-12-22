@@ -12,16 +12,12 @@ export default class AuthService {
 
   static async registration(
     name: string,
-    firstName: string,
-    lastName: string,
     email: string,
     password: string,
     passwordConfirmation: string
   ): Promise<AxiosResponse<AuthResponse>> {
     console.log('begin register');
     return api.post<AuthResponse>('/v1/auth/register', {
-      firstName,
-      lastName,
       name,
       email,
       password,
@@ -30,7 +26,8 @@ export default class AuthService {
   }
   static async logout(): Promise<void> {
     console.log('LOG OUT DAY');
-
+    // localStorage.removeItem('token');
+    // localStorage.removeItem('isAuth');
     return api.post('/v1/auth/logout');
   }
 }
