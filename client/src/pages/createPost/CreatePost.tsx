@@ -22,12 +22,12 @@ import NotFound from '../404/NotFound';
 import TagsSelect from '../../components/tagsSelect/TagsSelect';
 import { ITag } from '../../types/tag-type';
 import { current } from '@reduxjs/toolkit';
-
+import axios from 'axios';
 const CreatePost: FC = () => {
   const { postId } = useParams();
   const [file, setFile] = useState<any>(null);
   const { user, isAuth } = useAppSelector((state) => state.auth);
-  const [currentPost, setCurrentPost] = useState<IPost>({} as IPost);
+  const [currentPost, setCurrentPost] = useState<IPost>({} as any);
   const [currentPostTest, setCurrentPostTest] = useState();
 
   const {
@@ -46,10 +46,6 @@ const CreatePost: FC = () => {
   useTitle(postId ? 'Edit' : 'Create');
 
   useEffect(() => {
-    const test = PostService.getById(Number(postId));
-    console.log('GET DATA POST', test);
-    console.log('user', user);
-
     if (postId) {
       PostService.getById(Number(postId))
         .then(async (response) => {
@@ -57,26 +53,34 @@ const CreatePost: FC = () => {
             setNotFound(true);
             return;
           }
+          console.log('response.data.user.id ', response.data.user.id);
+          console.log('user.id', user.id);
+          setIsLoading(true);
+
           await setCurrentPost(response?.data);
           await setSelectedTags(response?.data?.tags);
           console.log('currentPost', currentPost);
+          // console.log('isAuth', isAuth);
+          // console.log('postId', postId);
 
           // console.log('currentPost RES DATA', response.data);
           // console.log('currentPost', currentPost);
           // console.log('selectedTags', selectedTags);
+          // console.log('ditmemay', Object.keys(currentPost).length);
 
           setEditorState(
             EditorState.createWithContent(
               ContentState.createFromBlockArray(
-                convertFromHTML(response.data.text).contentBlocks
+                convertFromHTML(response?.data?.content).contentBlocks
               )
             )
           );
         })
         .catch((err) => setNotFound(true));
     }
-    console.log('currentPost', currentPost);
-  }, [postId, user, isAuth]);
+    // console.log('currentPost', currentPost);
+    // console.log('currentPost', currentPost);
+  }, [postId, user, isAuth, isLoading]);
 
   const onSubmit = async (data: any) => {
     let response;
@@ -89,8 +93,7 @@ const CreatePost: FC = () => {
         response = await PostService.updatePost(
           data['Title'] === '' ? currentPost?.title : data['Title'],
           stringFromHtml,
-          currentPost?.blogImage,
-          currentPost?.id,
+          currentPost.id,
           file,
           selectedTags
         );
@@ -103,8 +106,10 @@ const CreatePost: FC = () => {
           selectedTags
         );
       }
-      //   navigate(`/posts/${response.data.id}`);
-      navigate(`/v1/blog/${response.data.body.id}`);
+      navigate(`/posts/${response.data.body.id}`);
+      console.log('postsID CREATED', response.data);
+
+      // navigate(`/v1/blog/${response.data.body.id}`);
       //   console.log('response', response.data.body.id);
     } catch (e: any) {
       const response = e.response?.data.message;

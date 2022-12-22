@@ -39,10 +39,9 @@ const PostItem: FC<PostItemProps> = ({ post, displayImage }) => {
       <div className={'previewInfo'}>
         <div className={'previewInfoTop'}>
           <div className={'authorInfo'}>
-            <img src={post.user.avatar} alt="avatar" />
+            <img src={post?.user?.avatar} alt="avatar" />
             <div className={'authorDescription'}>
               <span className={'authorName'}>
-                {post.user.name}
                 {/* {post.user.firstName + ' ' + post.user.lastName} */}
               </span>
               <span className={'postDate'}>
@@ -50,7 +49,7 @@ const PostItem: FC<PostItemProps> = ({ post, displayImage }) => {
               </span>
             </div>
           </div>
-          {user?.id === post.user.id && <EditPostButtons post={post} />}
+          {user?.id === post.user?.id && <EditPostButtons post={post} />}
         </div>
 
         <div className={'postInfoTitle'}>

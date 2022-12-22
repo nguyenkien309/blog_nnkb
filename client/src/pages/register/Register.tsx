@@ -32,8 +32,6 @@ const Register: FC = () => {
     const args: authArgs = {
       type: 'register',
       name: data['Name'],
-      //   firstName: data['First Name'],
-      //   lastName: data['Last Name'],
       email: data['Email'],
       password: data['Password'],
       passwordConfirmation: data['PasswordConfirmation'],
