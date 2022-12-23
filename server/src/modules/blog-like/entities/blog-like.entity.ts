@@ -14,7 +14,7 @@ export class BlogLikeEntity extends DateAudit {
   @ManyToOne(() => UserEntity, (user) => user.likedBlogs, { eager: true })
   user: number;
 
-  @ManyToOne(() => BlogEntity, (post) => post.userLikes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => BlogEntity, (post) => post.userLikes)
   blog: number;
   // @ManyToOne(() => BlogEntity, (BlogEntity) => BlogEntity.id)
   // @JoinColumn({ name: 'blogId' })

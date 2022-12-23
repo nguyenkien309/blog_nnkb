@@ -15,7 +15,6 @@ export class BlogCommentEntity extends DateAudit {
   userId: string;
 
   @ManyToOne(() => UserEntity, (UserEntity) => UserEntity.id, {
-    onDelete: 'RESTRICT',
     eager: true,
   })
   @JoinColumn({ name: 'userId' })
@@ -24,15 +23,9 @@ export class BlogCommentEntity extends DateAudit {
   @Column()
   blogId: number;
 
-  @ManyToOne(() => BlogEntity, (blog) => blog.id, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => BlogEntity, (blog) => blog.id, { cascade: true })
   @JoinColumn({ name: 'blogId' })
   blog: BlogEntity;
-
-  @ManyToOne(() => BlogEntity, (post) => post.comments, { onDelete: 'CASCADE' })
-  post: number;
-
-  // @ManyToOne(() => BlogEntity, (post) => post.comments, { onDelete: 'CASCADE' })
-  // blog: number;
 
   constructor(partial: Partial<BlogCommentEntity>) {
     super();

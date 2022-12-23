@@ -25,7 +25,7 @@ export class BlogEntity extends DateAudit {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   content: string;
 
   @Column({ default: 0, nullable: true })
@@ -44,14 +44,13 @@ export class BlogEntity extends DateAudit {
   userId: string;
 
   @ManyToOne(() => UserEntity, (UserEntity) => UserEntity.id, {
-    onDelete: 'RESTRICT',
     eager: true,
   })
   @JoinColumn({ name: 'userId' })
   userCreated: UserEntity[];
 
-  @ManyToOne(() => UserEntity, (user) => user.blogs, { eager: true, onDelete: 'CASCADE' })
-  user: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.blogs, { eager: true })
+  user: number;
 
   @OneToMany(() => BlogCommentEntity, (comment) => comment.blog, { eager: true })
   comments: BlogCommentEntity[];
@@ -65,14 +64,6 @@ export class BlogEntity extends DateAudit {
   @ManyToMany(() => TagEntity, { eager: true })
   @JoinTable()
   tags: TagEntity[];
-
-  // @ManyToMany(() => TagEntity, (tag) => tag.post, { eager: true })
-  // @JoinTable()
-  // tags: TagEntity[];
-
-  // @ManyToMany(() => TagEntity, (TagEntity) => TagEntity.id, { eager: true })
-  // @JoinTable()
-  // tags: TagEntity[];
 
   constructor(partial: Partial<BlogEntity>) {
     super();
