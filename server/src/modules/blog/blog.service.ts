@@ -1,3 +1,5 @@
+import { BlogCommentEntity } from './../blog-comment/entities/blog-comment.entity';
+import { AuthUserDto } from './../../base/base.dto';
 import { TagService } from './../tag/tag.service';
 import { TagEntity } from './../tag/entities/tag.entity';
 import { BlogLikeEntity } from './../blog-like/entities/blog-like.entity';
@@ -13,9 +15,20 @@ import { BaseService } from './../../base/base.service';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { BlogEntity } from './entities/blog.entity';
 import { PaginationQueryDto } from '@base/base.dto';
+import { async } from 'rxjs';
 
 @Injectable()
 export class BlogService extends BaseService<BlogEntity, BlogRepository> {
+  delete(id: EntityId) {
+    return this.repository.manager.transaction(async (manager) => {
+      const blog = await manager.findOneBy(BlogEntity, { id: <number>id });
+      blog.tags = [];
+      blog.save();
+      await manager.delete(BlogLikeEntity, { blogId: id });
+      await manager.delete(BlogCommentEntity, { blogId: id });
+      await manager.delete(BlogEntity, { id: id });
+    });
+  }
   constructor(
     repository: BlogRepository,
     logger: LoggerService,
@@ -25,16 +38,30 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
   }
 
   async getBlogsPaginate(userId, query: PaginationQueryDto) {
-    const { limit = 1, page = 2, sort } = query;
-    // console.log(query)
+    const { limit = 20, page = 0, keyword, id, sort } = query;
 
     const qb = this.repository.createQueryBuilder('blogs');
+
+    if (id) {
+      console.log(id);
+
+      qb.andWhere('blogs.id = :id', { id: id });
+    }
+    // if (keyword) {
+    //   qb.andWhere('blogs.title LIKE :title', { title: `%${keyword}%` });
+    //   qb.andWhere('blogs.content LIKE :content', { content: `%${keyword}%` });
+    // }
     qb.andWhere('blogs.deleted = false');
+    // qb.andWhere('blogs.status = :status', { status: BlogStatus.APPROVE });
     qb.skip(limit * page)
       .take(limit)
-      .orderBy(sort?.by, sort?.direction);
+      .orderBy(sort?.by, sort?.direction)
+      .orderBy('blogs.numLike', 'DESC')
+      .orderBy('blogs.numSeen', 'DESC');
 
     const [blogs, total] = await qb.getManyAndCount();
+    console.log(qb.getQuery());
+    console.log(total);
     return blogs;
   }
 
@@ -93,83 +120,46 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
   //   });
   // }
 
-  async createBlog(userId, createBlogDto: CreateBlogDto, file): Promise<BlogEntity | undefined> {
+  async createBlog(authUserDto: AuthUserDto, createBlogDto: CreateBlogDto, file): Promise<BlogEntity | undefined> {
     const createBlog = new BlogEntity(createBlogDto);
-    createBlog.userId = userId.payload.id;
+    createBlog.userId = authUserDto.payload.id;
     if (file) {
       const filepath = await this.uploadService.createFile(file);
       createBlog.blogImage = filepath;
     }
     if (createBlog.tags) {
-      const tagsArray = createBlogDto.tags.map((tag) => JSON.parse(JSON.stringify(tag)));
-      const arrayTag = tagsArray.map((tag) => JSON.parse(tag));
-      createBlog.tags = arrayTag as TagEntity[];
+      const tagsArray = createBlogDto.tags.map((tag) => new TagEntity(tag));
+      createBlog.tags = tagsArray as TagEntity[];
     }
-    // console.log('createBlog.tags', createBlog.tags);
 
     await this.repository.save(createBlog);
-    // const blog = await this._store(createBlog);
-    // if (createBlog.tags) {
-    // const createTag = new TagEntity(createBlogDto);
-    // createTag.blogId = blog.id;
-    // createTag.name = 'test';
-    // await this.tagService._store(createTag);
-    // console.log('createBlog.id', blog.id, createTag.name);
-    // }
     return this.findBlogById(createBlog.id);
-    // return await this._findById(blog.id);
-    // return;
   }
-
-  // async editBlog(blogId: EntityId, updateBlogDto: UpdateBlogDto, file): Promise<BlogEntity | undefined> {
-  //   const blog = await this._findById(blogId);
-  //   const updateBlog = new BlogEntity(updateBlogDto);
-  //   if (!blog) {
-  //     throw new HttpException(`Not Found Blog : ${blogId}`, HttpStatus.BAD_REQUEST);
-  //   }
-  //   if (file) {
-  //     const filepath = await this.uploadService.createFile(file);
-  //     updateBlog.blogImage = filepath;
-  //     if (updateBlog.tags) {
-  //       const tagsArray = updateBlogDto.tags.map((tag) => JSON.parse(JSON.stringify(tag)));
-  //       const arrayTag = tagsArray.map((tag) => JSON.parse(tag));
-  //       updateBlog.tags = arrayTag as TagEntity[];
-  //     }
-  //   }
-
-  //   return this._update(blogId, updateBlog);
-  // }
 
   async editBlog2(id, updateBlogDto: UpdateBlogDto, file) {
     updateBlogDto.blogId = id;
     let { blogImage } = updateBlogDto;
     const post = await this._findById(id);
     let arrayTag;
-    const updateBlog = new BlogEntity(updateBlogDto);
     if (file) {
       const filepath = await this.uploadService.createFile(file);
       blogImage = filepath;
       if (updateBlogDto.tags) {
-        const tagsArray = updateBlogDto.tags.map((tag) => JSON.parse(JSON.stringify(tag)));
-        arrayTag = tagsArray.map((tag) => JSON.parse(tag));
+        arrayTag = updateBlogDto.tags.map((tag) => new TagEntity(tag));
         // console.log('updateBlogDto.tags', updateBlogDto.tags);
-        console.log('tagsArray', tagsArray);
+        console.log('tagsArray', arrayTag);
       }
     }
-
-    // post.title = title;
-    // post.content = content;
     post.blogImage = blogImage;
     console.log('blogImage', blogImage);
 
     post.tags = arrayTag ? arrayTag : updateBlogDto.tags;
-    // console.log('post.tags', arrayTag);
     await this.repository.save(post);
     return post;
   }
 
   async deleteBlog(blogId: EntityId): Promise<DeleteResult | undefined> {
-    return this.delete(blogId);
+    return this._delete(blogId);
   }
 
   async updatenumLike(id: EntityId, isAdd = true): Promise<BlogEntity> {

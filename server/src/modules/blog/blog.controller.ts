@@ -1,4 +1,3 @@
-import { PaginationQueryDto } from './dto/paginate-blog.dto';
 import { BlogLikeService } from './../blog-like/blog-like.service';
 import { BlogLikeEntity } from './../blog-like/entities/blog-like.entity';
 import { CreateBlogLikeDto } from './../blog-like/dto/create-blog-like.dto';
@@ -7,7 +6,7 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BlogEntity } from './entities/blog.entity';
 import { CreateBlogDto } from './dto/create-blog.dto';
-import { AuthUserDto, BaseResponseDto } from './../../base/base.dto';
+import { AuthUserDto, BaseResponseDto, PaginationQueryDto } from './../../base/base.dto';
 import { AuthUser } from './../../decorator/auth.user.decorator';
 import { BlogService } from './blog.service';
 import { JwtAuthGuard } from './../auth/guards/jwt-auth.guard';
@@ -59,15 +58,11 @@ export class BlogController {
     return;
   }
 
-  @Get('/blog-paginate/test')
-  async listBlogsPaginateTest(@AuthUser() authUser: AuthUserDto, @Query() query: PaginationQueryDto) {
+  // @UseGuards(JwtAuthGuard)
+  @Get('lastest')
+  async listBlogsPaginateTest(@Query() query: PaginationQueryDto, @AuthUser() authUser: AuthUserDto) {
     return this.blogService.getBlogsPaginate(authUser, query);
   }
-
-  // @Get('/blogTag')
-  // async listTest() {
-  //   return this.blogService.listTest();
-  // }
 
   @Get('/blogTag/:tagId')
   getPostsByTagId(@Param('tagId', new ParseIntPipe()) tagId: number) {
@@ -93,23 +88,6 @@ export class BlogController {
   async findBlog(@Param('id') id: EntityId) {
     return await this.blogService.getBlogById(id);
   }
-
-  // @Get(':id/blog')
-  // async findBlog(@Param('id') id: EntityId): Promise<BaseResponseDto<BlogEntity>> {
-  //   const blog = await this.blogService.getBlogById(id);
-  //   return new BaseResponseDto<BlogEntity>(plainToClass(BlogEntity, blog));
-  // }
-
-  // @UseInterceptors(FileInterceptor('file'))
-  // @Patch(':id')
-  // async editBlog(
-  //   @Param('id') blogId: EntityId,
-  //   @Body() updateBlogDto: UpdateBlogDto,
-  //   @UploadedFile() file: Express.Multer.File,
-  // ): Promise<BaseResponseDto<BlogEntity>> {
-  //   const blog = await this.blogService.editBlog(blogId, updateBlogDto, file);
-  //   return new BaseResponseDto<BlogEntity>(plainToClass(BlogEntity, blog));
-  // }
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
