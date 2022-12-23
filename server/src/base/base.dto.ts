@@ -14,6 +14,10 @@ export class BaseResponseDto<T> {
   }
 }
 
+interface payload {
+  id: string;
+}
+
 export class AuthUserDto {
   id: number;
   email: string;

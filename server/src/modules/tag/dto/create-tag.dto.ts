@@ -8,4 +8,8 @@ export class createTagDto {
   @IsString({ message: 'Description must be string' })
   @IsNotEmpty()
   description: string;
+
+  @IsString({ message: 'Description must be string' })
+  @IsNotEmpty()
+  color: string;
 }
