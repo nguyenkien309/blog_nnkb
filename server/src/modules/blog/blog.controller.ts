@@ -1,9 +1,5 @@
-import { BlogLikeService } from './../blog-like/blog-like.service';
-import { BlogLikeEntity } from './../blog-like/entities/blog-like.entity';
-import { CreateBlogLikeDto } from './../blog-like/dto/create-blog-like.dto';
 import { EntityId } from 'typeorm/repository/EntityId';
-import { plainToClass, plainToInstance } from 'class-transformer';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { plainToClass } from 'class-transformer';
 import { BlogEntity } from './entities/blog.entity';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { AuthUserDto, BaseResponseDto, PaginationQueryDto } from './../../base/base.dto';
@@ -17,18 +13,18 @@ import {
   HttpStatus,
   Post,
   Body,
-  UploadedFile,
-  UseInterceptors,
   Get,
   Param,
   Patch,
   Delete,
   ParseIntPipe,
   Query,
+  BadGatewayException,
 } from '@nestjs/common';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { DeleteResult } from 'typeorm';
 import { ApiTags } from '@nestjs/swagger';
+import { ErrorCode } from '@src/constant/errorCode.enum';
 
 @ApiTags('v1/blog')
 @Controller('v1/blog')
@@ -47,13 +43,8 @@ export class BlogController {
   }
 
   @Get(':id/user-blog')
-  async listBlogUser(@Param('id') id: EntityId, @AuthUser() authUser: AuthUserDto) {
+  async listBlogUser(@Param('id') id: number, @AuthUser() authUser: AuthUserDto) {
     return this.blogService.getBlogUser(id, authUser);
-  }
-
-  @Get('/blog-paginate')
-  async listBlogsPaginate() {
-    return;
   }
 
   @Get('/blogTag/:tagId')
@@ -66,11 +57,6 @@ export class BlogController {
     return this.blogService.getBlogsPaginate(query);
   }
 
-  // @Get('blogs-lastest')
-  // async listLastestBlogs() {
-  //   return this.blogService.getLastestBlogs();
-  // }
-
   @Get('blogs-hot')
   async listHotBlogs(@Query() query: PaginationQueryDto) {
     return this.blogService.getHotBlogs(query);
@@ -82,23 +68,27 @@ export class BlogController {
   }
 
   @Get(':id')
-  async findBlog(@Param('id') id: EntityId) {
+  async findBlog(@Param('id') id: number) {
     return await this.blogService.getBlogById(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async editBlog(
-    @Param('id') blogId: EntityId,
+    @Param('id') blogId: number,
     @Body() updateBlogDto: UpdateBlogDto,
   ): Promise<BaseResponseDto<BlogEntity>> {
-    const blog = await this.blogService.editBlog2(blogId, updateBlogDto);
+    const blog = await this.blogService.editBlog(blogId, updateBlogDto);
     return new BaseResponseDto<BlogEntity>(plainToClass(BlogEntity, blog));
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async destroy(@Param('id') id: EntityId, @AuthUser() authUser: AuthUserDto): Promise<BaseResponseDto<DeleteResult>> {
+  async destroy(@Param('id') id: number, @AuthUser() authUser: AuthUserDto): Promise<BaseResponseDto<DeleteResult>> {
+    const blog = await this.blogService.findBlogById(id);
+    if (blog.userId !== authUser.payload.id || blog.userId !== authUser.id) {
+      throw new BadGatewayException(ErrorCode.PERMISSION_DENIED);
+    }
     await this.blogService.delete(id);
     return new BaseResponseDto<DeleteResult>(null);
   }

@@ -1,34 +1,21 @@
 import { BlogCommentEntity } from './../blog-comment/entities/blog-comment.entity';
 import { AuthUserDto } from './../../base/base.dto';
-import { TagService } from './../tag/tag.service';
 import { TagEntity } from './../tag/entities/tag.entity';
 import { BlogLikeEntity } from './../blog-like/entities/blog-like.entity';
-import { CreateBlogLikeDto } from './../blog-like/dto/create-blog-like.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { EntityId } from 'typeorm/repository/EntityId';
 import { UploadService } from './../upload-file/upload-file.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { LoggerService } from '../../logger/custom.logger';
-import { Repository, Entity, DeleteResult } from 'typeorm';
+import { DeleteResult } from 'typeorm';
 import { BlogRepository } from './blog.repository';
 import { BaseService } from './../../base/base.service';
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BlogEntity } from './entities/blog.entity';
 import { PaginationQueryDto } from '@base/base.dto';
-import { async } from 'rxjs';
 
 @Injectable()
 export class BlogService extends BaseService<BlogEntity, BlogRepository> {
-  delete(id: EntityId) {
-    return this.repository.manager.transaction(async (manager) => {
-      const blog = await manager.findOneBy(BlogEntity, { id: <number>id });
-      blog.tags = [];
-      blog.save();
-      await manager.delete(BlogLikeEntity, { blogId: id });
-      await manager.delete(BlogCommentEntity, { blogId: id });
-      await manager.delete(BlogEntity, { id: id });
-    });
-  }
   constructor(
     repository: BlogRepository,
     logger: LoggerService,
@@ -43,7 +30,6 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     // let sort = query.sort ? query.sort : 'DESC';
     // let filter = query.filter ? query.filter : ;
     const qb = this.repository.createQueryBuilder('blogs');
-    // qb.leftJoinAndSelect('blogs.media', 'm')
     qb.leftJoinAndSelect('blogs.user', 'u');
     qb.leftJoinAndSelect('blogs.tags', 't');
     // if (id) {
@@ -67,19 +53,11 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     return blogs;
   }
 
-  async listTest() {
-    return '';
-  }
-
   async getLastestBlogs() {
     return this._findByDeleted(false, false, 0);
   }
 
   async getHotBlogs(query: PaginationQueryDto) {
-    // return await this.repository.find({
-    //   where: { deleted: false },
-    //   order: { numLike: 'DESC', numComment: 'DESC' },
-    // });
     const limit = query.limit ? query.limit : 4;
     const page = query.page ? query.page : 0;
     // let sort = query.sort ? query.sort : 'DESC';
@@ -111,22 +89,14 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
   }
 
   async getTopBlogs(query: PaginationQueryDto) {
-    // return await this.repository.find({
-    //   where: { deleted: false },
-    //   order: { numComment: 'DESC' },
-    // });
-
-    //
     const limit = query.limit ? query.limit : 4;
     const page = query.page ? query.page : 0;
     // let sort = query.sort ? query.sort : 'DESC';
     // let filter = query.filter ? query.filter : ;
     const qb = this.repository.createQueryBuilder('blogs');
-    // qb.leftJoinAndSelect('blogs.media', 'm')
     qb.leftJoinAndSelect('blogs.user', 'u');
     qb.leftJoinAndSelect('blogs.tags', 't');
     qb.andWhere('blogs.deleted = false');
-    // qb.andWhere('blogs.status = :status', { status: BlogStatus.APPROVE });
     qb.skip(limit * page)
       .take(limit)
       // .orderBy(sort?.by, sort?.direction)
@@ -141,37 +111,17 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
   }
 
   async getBlogById(id) {
-    // return this._findById(id,{
-    //   relations: ['comments', 'blog-like'],
-    // }));
-
     return this.repository.findOne({
       where: { id: id },
       relations: ['comments', 'userLikes'],
     });
-
-    // return await this.repository.find({
-    //   where: { deleted: false },
-    //   order: { numLike: 'DESC', numComment: 'DESC' },
-    // });
-
-    // const post = await this.repository.find(id, {
-    //   relations: ['comments', 'userLikes'],
-    // });
   }
 
   async getBlogUser(id, user) {
-    // console.log(user);
-    // return user;
     return this.repository.find({
       where: { userId: id },
     });
   }
-  // async getBlogByIdRlt(id) {
-  //   return this.repository.findOne({
-  //     relations: ['comments', 'blog-like'],
-  //   });
-  // }
 
   async createBlog(authUserDto: AuthUserDto, createBlogDto: CreateBlogDto): Promise<BlogEntity | undefined> {
     const createBlog = new BlogEntity(createBlogDto);
@@ -184,7 +134,7 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     return this.findBlogById(createBlog.id);
   }
 
-  async editBlog2(id, updateBlogDto: UpdateBlogDto) {
+  async editBlog(id, updateBlogDto: UpdateBlogDto) {
     updateBlogDto.blogId = id;
     const { blogImage } = updateBlogDto;
     const post = await this._findById(id);
@@ -222,12 +172,23 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     return exist;
   }
 
-  async findBlogById(id) {
+  async findBlogById(id: number) {
     return this._findById(id);
   }
 
   async getPostsByTagId(tagId: number) {
     const posts = await this.repository.find();
     return posts.filter((post) => post.tags.some((tag) => tag.id === tagId));
+  }
+
+  delete(id: EntityId) {
+    return this.repository.manager.transaction(async (manager) => {
+      const blog = await manager.findOneBy(BlogEntity, { id: <number>id });
+      blog.tags = [];
+      blog.save();
+      await manager.delete(BlogLikeEntity, { blogId: id });
+      await manager.delete(BlogCommentEntity, { blogId: id });
+      await manager.delete(BlogEntity, { id: id });
+    });
   }
 }

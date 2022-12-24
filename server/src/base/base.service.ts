@@ -2,10 +2,7 @@ import { PAGE_SIZE } from './../config/config';
 import { LoggerService } from '../logger/custom.logger';
 import { IBaseService } from './i.base.service';
 import { BaseEntity, FindOptionsOrder, FindOptionsWhere, In, Repository, DataSource, DeleteResult } from 'typeorm';
-// tim
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { EntityId } from 'typeorm/repository/EntityId';
-import { InjectDataSource } from '@nestjs/typeorm';
 
 export class BaseService<T extends BaseEntity, R extends Repository<T>> implements IBaseService<T> {
   protected readonly repository: R;
@@ -15,8 +12,6 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
     this.logger = logger;
   }
 
-  // USER
-  //ADMIN
   async _findByDeleted(deleted: boolean, sort: boolean, page: 0): Promise<T[] | null> {
     return await this.repository.find({
       where: { deleted: deleted } as unknown as FindOptionsWhere<T>,
@@ -26,7 +21,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
     });
   }
 
-  index(): Promise<T[]> {
+  async _index(): Promise<T[]> {
     return this.repository.find();
   }
 

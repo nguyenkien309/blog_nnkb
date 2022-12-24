@@ -55,6 +55,7 @@ export class AllExceptionFilter implements ExceptionFilter {
   }
 
   private handleMessage(exception: HttpException | QueryFailedError | Error): void {
+    this.logger.error(exception.stack);
     let message = 'Internal Server Error';
 
     if (exception instanceof HttpException) {
@@ -67,7 +68,5 @@ export class AllExceptionFilter implements ExceptionFilter {
         message = 'Not Found';
       }
     }
-
-    this.logger.error(message);
   }
 }

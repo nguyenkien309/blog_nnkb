@@ -1,6 +1,6 @@
 import { UpdateUserDto } from './../dto/update-user.dto';
 import { AuthUser } from './../../../decorator/auth.user.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from './../../auth/guards/jwt-auth.guard';
 import { BaseResponseDto, AuthUserDto } from './../../../base/base.dto';
 import { UserService } from 'src/modules/user/user.service';
@@ -8,15 +8,10 @@ import { Body, Controller, Get, HttpCode, Post, UseGuards, HttpStatus } from '@n
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { UserEntity } from '../entities/user.entity';
 
+@ApiTags('v1/user')
 @Controller('v1/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Get('/test')
-  async test(): Promise<BaseResponseDto<any>> {
-    const data = await this.userService.test();
-    return new BaseResponseDto<any>(plainToInstance(UserEntity, data));
-  }
 
   // @ApiBearerAuth()
   // @UseGuards(JwtAuthGuard)

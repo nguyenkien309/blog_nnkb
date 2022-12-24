@@ -16,9 +16,10 @@ export class ResponseTransformInterceptor<T> implements NestInterceptor<T, BaseR
     return next.handle().pipe(
       tap(() => {
         LoggerService.log(
-          `[${context?.getClass().name}] : ${request?.route?.path} : ${request.method} : ${new Date(
-            now,
-          ).toISOString()} ........ : ${Date.now() - now} ms`,
+          `${request?.route?.path} : ${request.method} : ${new Date(now).toISOString()} ........ : ${
+            Date.now() - now
+          } ms`,
+          context?.getClass().name,
         );
       }),
       map((response) => {

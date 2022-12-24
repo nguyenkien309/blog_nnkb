@@ -9,13 +9,8 @@ export class RegisterRequestDto {
 
   @IsNotEmpty({ message: 'email is not empty' })
   @IsEmail(undefined, { message: 'email invalid' })
-  @Validate(UniqueEmailValidator, { message: 'email invalid' })
+  @Validate(UniqueEmailValidator)
   email: string;
-
-  // @IsOptional()
-  // @IsNotEmpty()
-  // @Type(() => Number)
-  // avatarId: number;
 
   @IsNotEmpty({ message: 'password is not empty' })
   @Length(8, 24, { message: 'password invalid' })

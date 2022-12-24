@@ -51,7 +51,7 @@ export class AuthService {
       throw new UnauthorizedException(ErrorCode.DISABLED_ACCOUNT);
     }
     if (user.deleted) {
-      throw new HttpException(ErrorCode.DELETED_ACCOUNT, HttpStatus.BAD_REQUEST);
+      throw new UnauthorizedException(ErrorCode.DELETED_ACCOUNT);
     }
     const payload: AuthUserDto = {
       email: user.email,
@@ -59,14 +59,6 @@ export class AuthService {
       role: user.role,
     };
     const token = await this.createToken(payload, true);
-    // const acessToken = await this.createToken(payload);
-    // const refreshToken = await this.createRefreshToken(payload);
-    // await this.userService.updateRT(
-    //   { email: user.email },
-    //   {
-    //     refreshToken: refreshToken,
-    //   },
-    // );
     return { ...user, token };
   }
 
@@ -128,7 +120,6 @@ export class AuthService {
           role: verifyToken.payload.role,
           ...token,
         };
-        // return user;
       }
     } catch (err) {
       throw new UnauthorizedException('refresh_token invalid');
@@ -137,11 +128,11 @@ export class AuthService {
 
   async generateTokens(user: UserEntity) {
     const accessToken = this.jwtService.sign(user, {
-      expiresIn: '10m',
+      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
       secret: await this.configService.get('ACCESS_SECRET'),
     });
     const refreshToken = this.jwtService.sign(user, {
-      expiresIn: '30d',
+      expiresIn: this.configService.get<string>('JWT_REFESH_EXPIRES_IN'),
       secret: await this.configService.get('REFRESH_SECRET'),
     });
     return {

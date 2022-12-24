@@ -41,22 +41,16 @@ export class BlogEntity extends DateAudit {
   blogImage: string;
 
   @Column({ name: 'userId', nullable: true })
-  userId: string;
+  userId: number;
 
   @ManyToOne(() => UserEntity, (UserEntity) => UserEntity.id, {
     eager: true,
   })
-  @JoinColumn({ name: 'userId' })
-  userCreated: UserEntity[];
-
-  @ManyToOne(() => UserEntity, (user) => user.blogs, { eager: true })
-  user: number;
+  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
+  user: UserEntity;
 
   @OneToMany(() => BlogCommentEntity, (comment) => comment.blog, { eager: true })
   comments: BlogCommentEntity[];
-
-  // @OneToMany(() => BlogLikeEntity, (BlogLikeEntity) => BlogLikeEntity.blogId)
-  // bloglike: BlogLikeEntity[];
 
   @OneToMany(() => BlogLikeEntity, (like) => like.blog, { eager: true })
   userLikes: BlogLikeEntity[];

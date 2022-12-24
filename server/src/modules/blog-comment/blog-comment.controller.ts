@@ -1,27 +1,14 @@
 import { AuthUser } from './../../decorator/auth.user.decorator';
-import {
-  Controller,
-  UseGuards,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Body,
-  UploadedFile,
-  UseInterceptors,
-  Get,
-  Param,
-  Patch,
-  Delete,
-} from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get, Param, Delete } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { BlogCommentService } from './blog-comment.service';
-import { AuthUserDto, BaseResponseDto } from 'src/base/base.dto';
-import { BlogCommentEntity } from './entities/blog-comment.entity';
+import { AuthUserDto } from 'src/base/base.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { EntityId } from 'typeorm/repository/EntityId';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('v1/blog-comment')
 @Controller('v1/blog-comment')
-@UseGuards(JwtAuthGuard)
 export class BlogCommentController {
   constructor(private readonly blogCommentService: BlogCommentService) {}
 
@@ -40,16 +27,14 @@ export class BlogCommentController {
     return this.blogCommentService.findCommentId(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':id')
-  async createComment(
-    @AuthUser() authUser: AuthUserDto,
-    @Body() createCommentDto: CreateCommentDto,
-    @Param('id') id: EntityId,
-  ) {
+  async createComment(@AuthUser() authUser: AuthUserDto, @Body() createCommentDto: CreateCommentDto) {
     // return this.blogCommentService.createComment(authUser, createCommentDto, id);
     return this.blogCommentService.createComment(authUser, createCommentDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteComment(@AuthUser() authUser: AuthUserDto, @Param('id') id: EntityId) {
     return this.blogCommentService.deleteComment(authUser, id);

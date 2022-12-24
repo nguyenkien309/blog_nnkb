@@ -5,5 +5,5 @@ export class CreateBlogLikeDto {
   blogId: number;
 
   @IsNotEmpty()
-  userId: string;
+  userId: number;
 }
