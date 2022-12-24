@@ -1,3 +1,4 @@
+import { RefreshTokenDto } from './dto/refresh-dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { plainToInstance, plainToClass } from 'class-transformer';
@@ -46,11 +47,18 @@ export class AuthController {
     return this.authService.logout(user);
   }
 
+  // @HttpCode(HttpStatus.OK)
+  // @Post('/register')
+  // async register(@Body() registerRequestDto: RegisterRequestDto): Promise<BaseResponseDto<UserEntity>> {
+  //   // await this.authService.createToken(registerRequestDto);
+  //   const user = await this.userService._store(registerRequestDto);
+  //   return new BaseResponseDto<UserEntity>(plainToClass(UserEntity, user));
+  // }
+
   @HttpCode(HttpStatus.OK)
   @Post('/register')
-  async register(@Body() registerRequestDto: RegisterRequestDto): Promise<BaseResponseDto<UserEntity>> {
-    const user = await this.userService._store(registerRequestDto);
-    return new BaseResponseDto<UserEntity>(plainToClass(UserEntity, user));
+  async register(@Body() registerRequestDto: RegisterRequestDto) {
+    return await this.authService.createTokenRegister(registerRequestDto);
   }
 
   @ApiBearerAuth()
@@ -62,9 +70,9 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body() body) {
-    if (body.refresh_token) {
-      return await this.authService.refresh(body.refresh_token);
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    if (refreshTokenDto.refresh_token) {
+      return await this.authService.refresh(refreshTokenDto.refresh_token);
     }
     throw new BadRequestException('refresh token is required');
   }

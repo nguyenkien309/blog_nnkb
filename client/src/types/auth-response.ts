@@ -6,4 +6,5 @@ export interface AuthResponse {
   refreshToken: string;
   user: IUser;
   body: any;
+  role: string;
 }

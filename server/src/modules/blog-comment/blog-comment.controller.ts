@@ -18,7 +18,6 @@ import { BlogCommentService } from './blog-comment.service';
 import { AuthUserDto, BaseResponseDto } from 'src/base/base.dto';
 import { BlogCommentEntity } from './entities/blog-comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 import { EntityId } from 'typeorm/repository/EntityId';
 
 @Controller('v1/blog-comment')
@@ -48,16 +47,7 @@ export class BlogCommentController {
     @Param('id') id: EntityId,
   ) {
     // return this.blogCommentService.createComment(authUser, createCommentDto, id);
-    return this.blogCommentService.createComment(createCommentDto);
-  }
-
-  @Post(':id/update')
-  async updateComment(
-    @AuthUser() authUser: AuthUserDto,
-    @Body() updateCommentDto: UpdateCommentDto,
-    @Param('id') id: EntityId,
-  ) {
-    return this.blogCommentService.updateComment(authUser, updateCommentDto, id);
+    return this.blogCommentService.createComment(authUser, createCommentDto);
   }
 
   @Delete(':id')

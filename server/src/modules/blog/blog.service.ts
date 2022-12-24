@@ -37,16 +37,18 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     super(repository, logger);
   }
 
-  async getBlogsPaginate(userId, query: PaginationQueryDto) {
-    const { limit = 20, page = 0, keyword, id, sort } = query;
-
+  async getBlogsPaginate(query: PaginationQueryDto) {
+    const limit = query.limit ? query.limit : 4;
+    const page = query.page ? query.page : 0;
+    // let sort = query.sort ? query.sort : 'DESC';
+    // let filter = query.filter ? query.filter : ;
     const qb = this.repository.createQueryBuilder('blogs');
-
-    if (id) {
-      console.log(id);
-
-      qb.andWhere('blogs.id = :id', { id: id });
-    }
+    // qb.leftJoinAndSelect('blogs.media', 'm')
+    qb.leftJoinAndSelect('blogs.user', 'u');
+    qb.leftJoinAndSelect('blogs.tags', 't');
+    // if (id) {
+    //   qb.andWhere('blogs.id = :id', { id: id });
+    // }
     // if (keyword) {
     //   qb.andWhere('blogs.title LIKE :title', { title: `%${keyword}%` });
     //   qb.andWhere('blogs.content LIKE :content', { content: `%${keyword}%` });
@@ -55,36 +57,87 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
     // qb.andWhere('blogs.status = :status', { status: BlogStatus.APPROVE });
     qb.skip(limit * page)
       .take(limit)
-      .orderBy(sort?.by, sort?.direction)
-      .orderBy('blogs.numLike', 'DESC')
-      .orderBy('blogs.numSeen', 'DESC');
+      // .orderBy(sort?.by, sort?.direction)
+      .orderBy('blogs.updatedAt', 'DESC');
+    // .orderBy('blogs.numSeen', 'DESC');
 
     const [blogs, total] = await qb.getManyAndCount();
     console.log(qb.getQuery());
-    console.log(total);
+    console.log('total', total);
     return blogs;
   }
 
   async listTest() {
-    return 'ditme';
+    return '';
   }
 
   async getLastestBlogs() {
     return this._findByDeleted(false, false, 0);
   }
 
-  async getHotBlogs() {
-    return await this.repository.find({
-      where: { deleted: false },
-      order: { numLike: 'DESC', numComment: 'DESC' },
-    });
+  async getHotBlogs(query: PaginationQueryDto) {
+    // return await this.repository.find({
+    //   where: { deleted: false },
+    //   order: { numLike: 'DESC', numComment: 'DESC' },
+    // });
+    const limit = query.limit ? query.limit : 4;
+    const page = query.page ? query.page : 0;
+    // let sort = query.sort ? query.sort : 'DESC';
+    // let filter = query.filter ? query.filter : ;
+    const qb = this.repository.createQueryBuilder('blogs');
+    // qb.leftJoinAndSelect('blogs.media', 'm')
+    qb.leftJoinAndSelect('blogs.user', 'u');
+    qb.leftJoinAndSelect('blogs.tags', 't');
+    // if (id) {
+    //   qb.andWhere('blogs.id = :id', { id: id });
+    // }
+    // if (keyword) {
+    //   qb.andWhere('blogs.title LIKE :title', { title: `%${keyword}%` });
+    //   qb.andWhere('blogs.content LIKE :content', { content: `%${keyword}%` });
+    // }
+    qb.andWhere('blogs.deleted = false');
+    // qb.andWhere('blogs.status = :status', { status: BlogStatus.APPROVE });
+    qb.skip(limit * page)
+      .take(limit)
+      // .orderBy(sort?.by, sort?.direction)
+      .orderBy('blogs.numLike', 'ASC');
+    // .orderBy('blogs.numLike', 'DESC')
+    // .orderBy('blogs.numSeen', 'DESC');
+
+    const [blogs, total] = await qb.getManyAndCount();
+    console.log(qb.getQuery());
+    console.log('total', total);
+    return blogs;
   }
 
-  async getTopBlogs() {
-    return await this.repository.find({
-      where: { deleted: false },
-      order: { numComment: 'DESC' },
-    });
+  async getTopBlogs(query: PaginationQueryDto) {
+    // return await this.repository.find({
+    //   where: { deleted: false },
+    //   order: { numComment: 'DESC' },
+    // });
+
+    //
+    const limit = query.limit ? query.limit : 4;
+    const page = query.page ? query.page : 0;
+    // let sort = query.sort ? query.sort : 'DESC';
+    // let filter = query.filter ? query.filter : ;
+    const qb = this.repository.createQueryBuilder('blogs');
+    // qb.leftJoinAndSelect('blogs.media', 'm')
+    qb.leftJoinAndSelect('blogs.user', 'u');
+    qb.leftJoinAndSelect('blogs.tags', 't');
+    qb.andWhere('blogs.deleted = false');
+    // qb.andWhere('blogs.status = :status', { status: BlogStatus.APPROVE });
+    qb.skip(limit * page)
+      .take(limit)
+      // .orderBy(sort?.by, sort?.direction)
+      .orderBy('blogs.numLike', 'DESC')
+      .orderBy('blogs.numComment', 'DESC')
+      .orderBy('blogs.numSeen', 'DESC');
+
+    const [blogs, total] = await qb.getManyAndCount();
+    console.log(qb.getQuery());
+    console.log('total', total);
+    return blogs;
   }
 
   async getBlogById(id) {
@@ -120,40 +173,29 @@ export class BlogService extends BaseService<BlogEntity, BlogRepository> {
   //   });
   // }
 
-  async createBlog(authUserDto: AuthUserDto, createBlogDto: CreateBlogDto, file): Promise<BlogEntity | undefined> {
+  async createBlog(authUserDto: AuthUserDto, createBlogDto: CreateBlogDto): Promise<BlogEntity | undefined> {
     const createBlog = new BlogEntity(createBlogDto);
     createBlog.userId = authUserDto.payload.id;
-    if (file) {
-      const filepath = await this.uploadService.createFile(file);
-      createBlog.blogImage = filepath;
-    }
     if (createBlog.tags) {
       const tagsArray = createBlogDto.tags.map((tag) => new TagEntity(tag));
       createBlog.tags = tagsArray as TagEntity[];
     }
-
     await this.repository.save(createBlog);
     return this.findBlogById(createBlog.id);
   }
 
-  async editBlog2(id, updateBlogDto: UpdateBlogDto, file) {
+  async editBlog2(id, updateBlogDto: UpdateBlogDto) {
     updateBlogDto.blogId = id;
-    let { blogImage } = updateBlogDto;
+    const { blogImage } = updateBlogDto;
     const post = await this._findById(id);
-    let arrayTag;
-    if (file) {
-      const filepath = await this.uploadService.createFile(file);
-      blogImage = filepath;
-      if (updateBlogDto.tags) {
-        arrayTag = updateBlogDto.tags.map((tag) => new TagEntity(tag));
-        // console.log('updateBlogDto.tags', updateBlogDto.tags);
-        console.log('tagsArray', arrayTag);
-      }
+    if (updateBlogDto.blogImage) {
+      post.blogImage = blogImage;
     }
-    post.blogImage = blogImage;
-    console.log('blogImage', blogImage);
-
-    post.tags = arrayTag ? arrayTag : updateBlogDto.tags;
+    if (updateBlogDto.tags) {
+      const tagsArray = updateBlogDto.tags.map((tag) => new TagEntity(tag));
+      post.tags = tagsArray as TagEntity[];
+    }
+    post.tags = updateBlogDto.tags;
     await this.repository.save(post);
     return post;
   }

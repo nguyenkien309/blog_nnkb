@@ -22,6 +22,8 @@ const Sidebar: FC<{ homePage: boolean }> = ({ homePage }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [currentPage, setcurrentPage] = useState(0);
+  const [limitBlog, setlimitBlog] = useState(2);
   const handleClick = (path: string) => {
     if (isAuth) {
       return navigate(`/${path}`);
@@ -32,7 +34,7 @@ const Sidebar: FC<{ homePage: boolean }> = ({ homePage }) => {
   const handleSelectPosts = (
     type: 'blogs-lastest' | 'blogs-hot' | 'blogs-Top'
   ) => {
-    dispatch(fetchPosts({ type: type }));
+    dispatch(fetchPosts({ type: type, page: currentPage }));
   };
 
   return (

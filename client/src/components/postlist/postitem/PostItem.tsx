@@ -19,6 +19,7 @@ const PostItem: FC<PostItemProps> = ({ post, displayImage }) => {
   const { user } = useAppSelector((state) => state.auth);
   const [loadingImage, setLoadingImage] = useState(true);
   const navigate = useNavigate();
+  console.log('postITEM', post);
 
   return (
     <div onClick={() => navigate(`/posts/${post.id}`)} className={'postItem'}>
@@ -65,11 +66,11 @@ const PostItem: FC<PostItemProps> = ({ post, displayImage }) => {
         <div className={'postReactions'}>
           <div className={'postReactionsInfo'}>
             <FavoriteBorderIcon className={'postReactionsIcon'} />
-            <span>{post.userLikes.length} Likes</span>
+            <span>{post.numLike} Likes</span>
           </div>
           <div className={'postReactionsInfo2'}>
             <ChatBubbleOutlineIcon className={'postReactionsIcon'} />
-            <span>{post.comments.length} Comments</span>
+            <span>{post.numComment} Comments</span>
           </div>
         </div>
       </div>

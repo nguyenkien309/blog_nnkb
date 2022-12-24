@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import './register.scss';
 import FormGroup from '../../components/common/formGroup/FormGroup';
 import Button from '../../components/common/button/Button';
@@ -16,6 +16,7 @@ import { fetchPosts } from '../../store/reducers/posts/actionCreators';
 
 const Register: FC = () => {
   const { isLoading, error, isAuth } = useAppSelector((state) => state.auth);
+  const [Regis, setRegis] = useState(false);
   const {
     register,
     handleSubmit,
@@ -28,6 +29,25 @@ const Register: FC = () => {
     dispatch(setError(''));
   }, [dispatch]);
 
+  // const onSubmit = (data: any) => {
+  //   try {
+  //     const args: authArgs = {
+  //       type: 'register',
+  //       name: data['Name'],
+  //       email: data['Email'],
+  //       password: data['Password'],
+  //       passwordConfirmation: data['PasswordConfirmation'],
+  //     };
+  //     console.log('array register:', args);
+  //     dispatch(authRegister(args));
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  if (Regis) {
+    return <Navigate to={'/login'} />;
+  }
   const onSubmit = (data: any) => {
     const args: authArgs = {
       type: 'register',

@@ -40,7 +40,7 @@ const LatestList: FC<{ todayPosts: IPost[] }> = memo(({ todayPosts }) => {
             handleClick={() => handleCreate('/create')}
           />
         </div>
-        {role === 'admin' && (
+        {role === 'ADMIN' && (
           <div className={'createNewPostBtn'}>
             <Button
               text={'Create tag'}
@@ -66,7 +66,7 @@ const LatestList: FC<{ todayPosts: IPost[] }> = memo(({ todayPosts }) => {
                   <div className="latestPostReactions">
                     <div className="latestPostReactionItem">
                       <FavoriteBorderIcon className="latestPostReactionIconLike" />
-                      <span>{post.userLikes.length}</span>
+                      <span>{post.numLike}</span>
                     </div>
                   </div>
                 </li>

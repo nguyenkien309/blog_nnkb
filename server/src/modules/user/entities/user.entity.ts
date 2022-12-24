@@ -49,7 +49,7 @@ export class UserEntity extends DateAudit {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ default: '', name: 'refreshToken', nullable: true })
+  @Column({ default: '', type: 'varchar', name: 'refreshToken', nullable: true })
   refreshToken: string;
 
   constructor(partial: Partial<UserEntity>) {

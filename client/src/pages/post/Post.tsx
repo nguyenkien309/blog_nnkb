@@ -32,17 +32,20 @@ const Post = () => {
   useTitle(post.title);
 
   useEffect(() => {
-    console.log('user', user.id);
+    // console.log('user', user.id);
 
     const getPost = async () => {
       try {
-        const userLiked = localStorage.getItem('userInfo');
-        console.log('userLiked', userLiked);
+        // const userLiked = localStorage.getItem('userInfo');
+        // console.log('userLiked', userLiked);
         const fetchedPost = await PostService.getById(Number(postId));
+        console.log('CHECK AUTH', user == undefined);
+
         const getUserLike = await PostService.getUserLikeBlog(
           user?.id,
           Number(postId)
         );
+        console.log('BLOG LIKE', getUserLike);
 
         console.log('getUserLikeBlog', getUserLike.data);
         if (getUserLike.data == true) {
@@ -128,9 +131,9 @@ const Post = () => {
   //   }
   // };
 
-  if (error) {
-    return <NotFound />;
-  }
+  // if (error) {
+  //   return <NotFound />;
+  // }
 
   if (Object.keys(post).length === 0) {
     return <Loader />;
@@ -173,9 +176,8 @@ const Post = () => {
             <h1>{post.title}</h1>
           </div>
           <div className={'postPageTags'}>
-            {post.tags.map((tag) => (
-              <TagChip key={tag.id} tag={tag} />
-            ))}
+            {post.tags &&
+              post.tags.map((tag) => <TagChip key={tag.id} tag={tag} />)}
           </div>
           <div
             className={'postText'}
@@ -216,11 +218,11 @@ const Post = () => {
               )} */}
 
               {/* <span>{post.userLikes.length}</span> */}
-              <span>{post.numLike}</span>
+              <span>{post?.numLike}</span>
             </div>
             <div className={'postLike'}>
               <ChatBubbleOutlineIcon className={'postActionsIcon'} />
-              <span>{post.comments.length}</span>
+              <span>{post?.comments?.length}</span>
             </div>
           </div>
         </div>

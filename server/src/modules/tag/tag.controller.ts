@@ -8,7 +8,6 @@ import { createTagDto } from './dto/create-tag.dto';
 import { BaseResponseDto } from 'src/base/base.dto';
 
 @Controller('v1/tag')
-@UseGuards(JwtAuthGuard)
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
@@ -22,11 +21,13 @@ export class TagController {
     return this.tagService.findTag(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createTag(@Body() createTagDto: createTagDto) {
     return this.tagService.createTag(createTagDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteTag(@Param('id') id) {
     return this.tagService.deleteTag(id);

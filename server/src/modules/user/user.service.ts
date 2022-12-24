@@ -38,7 +38,7 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
 
   async updateUser(userId, updateUserDto: UpdateUserDto, file): Promise<UserEntity> {
     const findUser = await this._findById(userId.payload.id);
-    console.log('update profile', userId);
+    console.log('update profile', userId.payload.id);
     const updateUser = new UserEntity(updateUserDto);
 
     const filepath = await this.uploadService.createFile(file);

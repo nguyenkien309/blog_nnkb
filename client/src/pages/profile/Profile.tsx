@@ -8,9 +8,7 @@ import EditProfileForm from '../../components/editProfileForm/EditProfileForm';
 const Profile: FC = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [file, setFile] = useState<any>(null);
-  const test = JSON.parse(localStorage.getItem('userInfo') ?? '');
-  console.log('test profile', test);
-  console.log('test FILE', file);
+
   useEffect(() => {}, [user]);
   return (
     <div className={'profileWrapper'}>

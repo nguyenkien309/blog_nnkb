@@ -16,4 +16,6 @@ export interface IPost {
   user: IUser;
   body: any;
   numLike: number;
+  numComment: number;
+  userId: number;
 }

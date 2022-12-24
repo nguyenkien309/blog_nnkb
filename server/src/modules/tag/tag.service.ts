@@ -25,6 +25,6 @@ export class TagService extends BaseService<TagEntity, TagRepository> {
   }
 
   async deleteTag(tagId: number) {
-    return this.delete(tagId);
+    return this._delete(tagId);
   }
 }

@@ -6,6 +6,7 @@ export interface IComment {
   context: string;
   dateAndTimePublish: Date;
   user: IUser;
+  userId: any;
   post: IPost;
   createdAt: any;
   avatar: string;

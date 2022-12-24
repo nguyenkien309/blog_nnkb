@@ -38,16 +38,18 @@ export default class PostService {
   //   }
 
   static async getPosts(
-    type: 'blogs-lastest' | 'blogs-hot' | 'blogs-Top'
+    type: 'blogs-lastest' | 'blogs-hot' | 'blogs-Top',
+    page?: number
   ): Promise<AxiosResponse<IPost[]>> {
-    return api.get<IPost[]>(`v1/blog/${type}`);
+    return api.get<IPost[]>(`v1/blog/${type}?page=${page}`);
+    // return api.get<IPost[]>(`v1/blog/${type}`);
   }
 
   static async updatePost(
     title: string,
     content: string,
     postId: number,
-    picture: any,
+    picture?: any,
     // tags?: ITag[]
     tags?: any
     //
@@ -70,7 +72,7 @@ export default class PostService {
       // title,
       // content,
       // postId,
-      // picture,
+      picture,
     });
   }
 

@@ -1,3 +1,4 @@
+import { redirect } from 'react-router-dom';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AuthService from '../../../services/auth-service';
 import axios from 'axios';
@@ -19,9 +20,14 @@ export const authorizeUser = createAsyncThunk(
   async (args: authArgs, thunkAPI) => {
     try {
       let response;
-      const refresh_token = localStorage.getItem('refreshToken');
+      // const refresh_token = localStorage.getItem('refreshToken');
       if (args.type === 'login') {
         response = await AuthService.login(args.email!, args.password!);
+        console.log('LOGIN DATA', response);
+        // localStorage.setItem('token', response.data.body.token.accessToken);
+        // localStorage.setItem('refreshToken', response.data.body.refreshToken);
+        // localStorage.setItem('role', response.data.body.role);
+        localStorage.setItem('user', response.data.body.id);
       } else if (args.type === 'register') {
         response = await AuthService.registration(
           args.name!,
@@ -29,13 +35,8 @@ export const authorizeUser = createAsyncThunk(
           args.password!,
           args.passwordConfirmation!
         );
-      } else if (args.type === 'checkAuth') {
-        response = await axios.post<AuthResponse>(
-          `${API_URL}/v1/auth/refresh`,
-          {
-            refresh_token,
-          }
-        );
+        // console.log('response registraions', response.data);
+        // localStorage.setItem('refreshToken', response.data.refreshToken);
       }
       console.log('response REFRESH TOKEN', response);
 

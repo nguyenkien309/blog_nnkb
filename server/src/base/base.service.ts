@@ -51,7 +51,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
     return this._findById(id);
   }
 
-  delete(id: EntityId): Promise<DeleteResult> {
+  async _delete(id: EntityId): Promise<DeleteResult> {
     return this.repository.delete(id);
   }
 }

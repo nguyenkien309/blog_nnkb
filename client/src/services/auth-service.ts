@@ -25,9 +25,12 @@ export default class AuthService {
     });
   }
   static async logout(): Promise<void> {
+    const data = await api.post('/v1/auth/logout');
+    console.log('logOUT DATA', data);
+
     console.log('LOG OUT DAY');
-    // localStorage.removeItem('token');
-    // localStorage.removeItem('isAuth');
-    return api.post('/v1/auth/logout');
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('isAuth');
   }
 }

@@ -14,6 +14,8 @@ const TagPosts: FC = () => {
   const [tag, setTag] = useState<ITag>({} as ITag);
   const [error, setError] = useState('');
 
+  console.log('TAGOIST', posts);
+
   useEffect(() => {
     const getInfo = async (tagId: number) => {
       try {

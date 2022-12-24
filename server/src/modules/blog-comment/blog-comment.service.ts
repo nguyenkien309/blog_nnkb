@@ -8,6 +8,7 @@ import { Repository, Entity, DeleteResult } from 'typeorm';
 import { EntityId } from 'typeorm/repository/EntityId';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { BlogService } from '../blog/blog.service';
+import { AuthUserDto } from '@base/base.dto';
 
 @Injectable()
 export class BlogCommentService extends BaseService<BlogCommentEntity, BlogCommentRepository> {
@@ -16,9 +17,9 @@ export class BlogCommentService extends BaseService<BlogCommentEntity, BlogComme
   }
 
   // async createComment(userId, createCommentDto: CreateCommentDto, id): Promise<BlogCommentEntity> {
-  async createComment(createCommentDto: CreateCommentDto): Promise<BlogCommentEntity> {
+  async createComment(authUserDto: AuthUserDto, createCommentDto: CreateCommentDto): Promise<BlogCommentEntity> {
     const createComment = new BlogCommentEntity(createCommentDto);
-    createComment.userId = createCommentDto.userId;
+    createComment.userId = authUserDto.payload.id;
     createComment.blogId = createCommentDto.blogId;
     // createComment.blogId = createCommentDto.blogId;
     // createComment.userId = userId.payload.id;
@@ -46,7 +47,7 @@ export class BlogCommentService extends BaseService<BlogCommentEntity, BlogComme
     if (exist) {
       this.blogService.updatenumComment(exist.blogId, false);
     }
-    return this.delete(id);
+    return this._delete(id);
   }
 
   async findCommentId(id) {
