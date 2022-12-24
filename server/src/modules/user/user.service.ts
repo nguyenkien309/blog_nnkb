@@ -19,28 +19,16 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
     super(repository, logger);
   }
 
-  testABC(user) {
-    console.log('user', user);
-
-    return user;
-  }
-
   findByEmail(email: string): Promise<UserEntity | null> {
     return this.repository.findOne({ where: { email: email } });
   }
 
   async updateRefreshToken(filter, Token) {
-    // if (Token.refreshToken) {
-    //   Token.refreshToken = await bcrypt.hash(this.reverseToken(Token.refreshToken), 10);
-    // }
-    return await this._update(filter, Token);
+    return await this.repository.update(filter, Token);
   }
 
   async updateUser(userId, updateUserDto: UpdateUserDto, file): Promise<UserEntity> {
-    const findUser = await this._findById(userId.payload.id);
-    console.log('update profile', userId.payload.id);
     const updateUser = new UserEntity(updateUserDto);
-
     const filepath = await this.uploadService.createFile(file);
     if (filepath) {
       updateUser.avatar = filepath;
@@ -54,18 +42,12 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
   }
 
   async getAllUsers() {
-    return await this.repository.find({
-      // relations: ['blogs', 'comments'],
-    });
+    return await this.repository.find({});
   }
 
   async getAllUsersRLT() {
     return await this.repository.find({
       relations: ['blogs', 'comments'],
     });
-  }
-
-  test() {
-    return 'test';
   }
 }

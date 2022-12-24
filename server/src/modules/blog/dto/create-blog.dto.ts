@@ -1,11 +1,10 @@
 import { TagEntity } from './../../tag/entities/tag.entity';
-import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBlogDto {
   @ApiProperty()
-  // @IsString({ message: 'Title must be string' })
+  @IsString({ message: 'Title must be string' })
   readonly title: string;
 
   @ApiProperty()
@@ -15,7 +14,7 @@ export class CreateBlogDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsOptional()
-  readonly userId: string;
+  readonly userId: number;
 
   @ApiProperty()
   @IsOptional()

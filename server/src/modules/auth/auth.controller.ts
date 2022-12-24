@@ -15,18 +15,15 @@ import {
   HttpCode,
   Post,
   UseGuards,
-  Res,
   UseInterceptors,
   UploadedFile,
   Param,
-  UnauthorizedException,
   BadRequestException,
 } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { AuthUser } from 'src/decorator/auth.user.decorator';
-import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('v1/auth')
 @Controller('v1/auth')
@@ -103,7 +100,7 @@ export class AuthController {
   }
 
   @Get('/user')
-  async findUser(@Param('id') id) {
+  async findUser() {
     return await this.userService.getAllUsers();
   }
 
